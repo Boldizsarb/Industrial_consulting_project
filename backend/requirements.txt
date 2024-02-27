@@ -7,5 +7,4 @@ bcrypt == 2.0.0
 python-dotenv == 1.0.0
 flask_mail == 0.7.6
 PyJWT == 2.1.0
-
-
+flasgger==0.9.7.1

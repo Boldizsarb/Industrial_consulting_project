@@ -7,6 +7,8 @@ import os
 from dotenv import load_dotenv
 from email_sending import *
 from routes import configure_routes
+from flasgger import Swagger, LazyString, LazyJSONEncoder
+from flasgger import swag_from
 
 
 load_dotenv()
@@ -14,7 +16,7 @@ load_dotenv()
 
 app = Flask(__name__)
 mail = Mail(app)
-
+swagger = Swagger(app)
 
 ## POOL IS IN THE DATABASE FILE
 # Mail configuration
