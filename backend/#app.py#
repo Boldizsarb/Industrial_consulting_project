@@ -8,7 +8,7 @@ from dotenv import load_dotenv
 from email_sending import *
 from routes import configure_routes
 from flasgger import Swagger, LazyString, LazyJSONEncoder
-from flasgger import swag_from, utils
+from flasgger import swag_from
 
 
 load_dotenv()
@@ -16,9 +16,7 @@ load_dotenv()
 
 app = Flask(__name__)
 mail = Mail(app)
-app.config['SWAGGER'] = {
-    'title': 'Colors API'
-}
+
 swagger = Swagger(app)
 
 ## POOL IS IN THE DATABASE FILE
@@ -37,38 +35,34 @@ app.config['JWT_SECRET'] = os.environ.get('JWT_SECRET')
 CORS(app)
 
 configure_routes(app, mail)
-@app.route('/colors/<palette>/')
-def colors(palette):
-    """
-    file: documentation/colors.yml
-    """
-    all_colors = {
-        'cmyk': ['cyan', 'magenta', 'yellow', 'black'],
-        'rgb': ['red', 'green', 'blue']
-    }
-    if palette == 'all':
-        result = all_colors
-    else:
-        result = {palette: all_colors.get(palette)}
-
-    return jsonify(result)
-
-
-def test_swag(client, specs_data):
-    """
-    This test is runs automatically in Travis CI
-
-    :param client: Flask app test client
-    :param specs_data: {'url': {swag_specs}} for every spec in app
-    """
-    for url, spec in specs_data.items():
-        assert 'Palette' in spec['definitions']
-        assert 'Color' in spec['definitions']
-        assert 'colors' in spec['paths']['/colors/{palette}/']['get']['tags']
-
-
-
 @app.route('/message', methods=['GET'])
+@swagger.doc({
+    'tags': ['Hello'],
+    'description': 'Returns a hello message.',
+    'parameters': [
+        {
+            'name': 'name',
+            'description': 'The name to include in the hello message.',
+            'in': 'path',
+            'type': 'string',
+            'required': True
+        }
+    ],
+    'responses': {
+        '200': {
+            'description': 'A hello message is returned.',
+            'schema': {
+                'type': 'object',
+                'properties': {
+                    'message': {
+                        'type': 'string',
+                        'default': 'Hello, {name}!'
+                    }
+                }
+            }
+        }
+    }
+})
 def get_message():
     return jsonify({'message': 'Hello, World!'})
 
